@@ -1,38 +1,81 @@
 package com.rea.simulateRobot;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.*;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
-    extends TestCase
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+
+import com.rea.simulateRobot.exception.CannotPlaceRobotException;
+import com.rea.simulateRobot.exception.InvalidPositionException;
+import com.rea.simulateRobot.exception.MissingPositionSpecException;
+import com.rea.simulateRobot.exception.PositionNotSpecifiedException;
+import com.rea.simulateRobot.implementation.Simulator;
+import com.rea.simulateRobot.model.Direction;
+import com.rea.simulateRobot.model.Position;
+
+public class AppTest
 {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
+  
+    @Test
+    public void checkFinalDirectionWithNormalData() throws CannotPlaceRobotException, PositionNotSpecifiedException, InvalidPositionException, MissingPositionSpecException{
+    	
+    	List<String> list = new ArrayList<String>();
+    	list.add("PLACE 1,1,NORTH");
+    	list.add("MOVE");
+    	list.add("REPORT");
+    	Simulator simulator = new Simulator();
+    	Position position = simulator.getFinalLocation(list);
+    	assertEquals(Direction.NORTH, position.getDirection());
     }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
+    
+    @Test
+    public void checkFinalDirectionWithEmptySpaceData() throws CannotPlaceRobotException, PositionNotSpecifiedException, InvalidPositionException, MissingPositionSpecException{
+    	
+    	List<String> list = new ArrayList<String>();
+    	list.add("PLACE 1,1,EAST");
+    	list.add("MOVE");
+    	list.add("");
+    	list.add("REPORT");
+    	Simulator simulator = new Simulator();
+    	Position position = simulator.getFinalLocation(list);
+    	assertEquals(Direction.EAST, position.getDirection());
     }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    
+    @Test
+    public void checkFinalDirectionWithProperData() throws CannotPlaceRobotException, PositionNotSpecifiedException, InvalidPositionException, MissingPositionSpecException{
+    	
+    	List<String> list = new ArrayList<String>();
+    	list.add("PLACE 1,2,EAST");
+    	list.add("MOVE");
+    	list.add("MOVE");
+    	list.add("LEFT");
+    	list.add("MOVE");
+    	list.add("REPORT");
+    	Simulator simulator = new Simulator();
+    	Position position = simulator.getFinalLocation(list);
+    	assertEquals(Direction.NORTH, position.getDirection());
+    	assertEquals(3, position.getX_coordinate());
+    	assertEquals(3, position.getY_coordinate());;
     }
+    
+    
+    
+    /*@Test
+    public void checkNullDirectionForExceededCoordinates() throws CannotPlaceRobotException {
+    	
+    	
+    		List<String> list = new ArrayList<String>();
+        	list.add("PLACE 6,6,EAST");
+        	list.add("MOVE");
+        	list.add("");
+        	list.add("REPORT");
+        	Simulator simulator = new Simulator();
+        	Position position = simulator.getFinalLocation(list);
+        	
+        	thrown.
+    	
+    }*/
+   
 }
