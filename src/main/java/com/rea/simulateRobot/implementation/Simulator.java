@@ -9,6 +9,7 @@ import org.apache.commons.lang3.EnumUtils;
 import com.rea.simulateRobot.constants.Constants;
 import com.rea.simulateRobot.exception.CannotPlaceRobotException;
 import com.rea.simulateRobot.exception.InvalidDirectionException;
+import com.rea.simulateRobot.exception.InvalidPositionException;
 import com.rea.simulateRobot.exception.MissingPositionSpecException;
 import com.rea.simulateRobot.exception.PositionNotSpecifiedException;
 import com.rea.simulateRobot.model.Direction;
@@ -25,64 +26,128 @@ public class Simulator {
 	}
 
 	private Position getFinalLocation(List<String> commandList) {
+		
+		Position finalPosition = new Position();
+		boolean isPlaced = false;
 
 		for (int i = 0; i < commandList.size(); i++) {
-			if (i == 0) {				
-				String firstCommand = commandList.get(i);
-				setInitialPosition(firstCommand);			
-			}
 			
+			String[] commandArr = commandList.get(i).split(" ");
+			if(commandArr.length > 1 && commandArr[0].equalsIgnoreCase(Constants.PLACE)){
+				System.out.println("encountered PLACE command");
+				Position position = setInitialPosition(commandArr);
+				if(position.getX_coordinate() > 5 || position.getY_coordinate() > 5){
+						continue;
+				}else{
+					System.out.println("Found PLACE with proper position");
+					finalPosition.setX_coordinate(position.getX_coordinate());
+					finalPosition.setY_coordinate(position.getY_coordinate());
+					finalPosition.setDirection(position.getDirection());
+					isPlaced = true;
+				}
+			} else {
+				
+				if(isPlaced){
+					System.out.println("found PLACE command! Proceeding with "+commandList.get(i)+" command now!");
+					finalPosition = getLocationAfterMovement(finalPosition, commandList.get(i));
+				}
+				continue;
+			}
+					
 			if(commandList.get(i).equals("")){
 				continue;
 			}
 		}
+		
+		System.out.println("final location :: "+finalPosition);
+		return finalPosition;
+	}
+
+	private Position getLocationAfterMovement(Position finalPosition, String movement) {
+		
+		/*switch(movement.toLowerCase()) {
+		case "MOVE":
+			
+		}*/
 		return null;
 	}
 
-	private void setInitialPosition(String firstCommand) {
-		String[] commandArr = firstCommand.split(" ");
-
+	private Position setInitialPosition(String[] placeCommandArr) {
+		
+		Position position = new Position();
+		
 		try {
-			if (commandArr.length > 1) {
-				if (!commandArr[0].equals(Constants.PLACE)) {
+			if (placeCommandArr.length == 2) {
+				
+				//throws exception when the first command is not PLACE
+				if (!placeCommandArr[0].equalsIgnoreCase(Constants.PLACE)) {
 					throw new CannotPlaceRobotException(Constants.PLACE_EXCEPTION);
-				} else {
-					Object[] positionArr = commandArr[1].split(",");
-					if(positionArr.length < 3){
-						throw new MissingPositionSpecException(Constants.POSITION_SPEC_EXCEPTION);
-					}else{
-						Position position = new Position();
-						position.setX_coordinate(Integer.parseInt((String) positionArr[0]));
-						position.setY_coordinate(Integer.parseInt((String) positionArr[1]));
-
-						if(!EnumUtils.isValidEnum(Direction.class, (String)positionArr[2])){
-							throw new InvalidDirectionException(Constants.DIRECTION_EXCEPTION);
-						}else{
-							position.setDirection(Enum.valueOf(Direction.class, (String)positionArr[2]));
-						}			
-						
-						System.out.println("position of the robot is : "+position);
-					}						
+				} else {					
+					position = processRobotPosition(placeCommandArr[1]);	
 					
 				}
-			} else {
+			} else if (placeCommandArr.length < 2) {
+				//throws exception when the position co-ordinates of robot is missing
 				throw new PositionNotSpecifiedException(Constants.MISSING_POSITION_EXCEPTION);
+			} else {
+				throw new InvalidPositionException(Constants.INVALID_POSITION_EXCEPTION);
 			}
+		} catch(NumberFormatException ne) {
+			throw new NumberFormatException(Constants.NUMBER_FORMAT_EXCEPTION);
 		} catch (CannotPlaceRobotException e1) {
 			e1.printStackTrace();
 		} catch (PositionNotSpecifiedException e2) {
 			e2.printStackTrace();
-		} catch(MissingPositionSpecException e3) {
-			e3.printStackTrace();
+		} catch (InvalidPositionException e4) {
+			e4.printStackTrace();
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
+		return position;
 		
 	}
 
-	private void isDirectionInEnum(Object object, Class<Direction> enumClass) {
-		// TODO Auto-generated method stub
+	private Position processRobotPosition(String positionStr) {
 		
+		Position position = new Position();
+		try {
+			
+			Object[] positionArr = positionStr.split(",");
+			if (positionArr.length == 3) {
+
+				position.setX_coordinate(Integer.parseInt((String) positionArr[0]));
+				position.setY_coordinate(Integer.parseInt((String) positionArr[1]));
+
+				checkIfValidDirection((String) positionArr[2], position);
+				//checkIfValididCoordinates(position);
+
+			} else {
+				// throws exception if any of position co-ordinates is
+				// missing
+				throw new MissingPositionSpecException(Constants.POSITION_SPEC_EXCEPTION);
+			}
+		} catch (MissingPositionSpecException e) {
+			e.printStackTrace();
+		}
+		
+		return position;
+		
+	}
+
+
+	private void checkIfValidDirection(String direction, Position position) {
+
+		try {
+			if (EnumUtils.isValidEnum(Direction.class, direction)) {
+				position.setDirection(Enum.valueOf(Direction.class, direction));
+			} else {
+				// throws exception for invalid direction
+				throw new InvalidDirectionException(Constants.DIRECTION_EXCEPTION);
+			}
+		} catch (InvalidDirectionException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	// gives an introduction to our app with the instructions for using the
@@ -107,8 +172,8 @@ public class Simulator {
 				command = scanner.nextLine();
 				commandList.add(command);
 
-				// stops taking input from user, when user types report
-				if (command.equals(Constants.REPORT))
+				// stops taking input from user, when user types REPORT
+				if (command.equalsIgnoreCase(Constants.REPORT))
 					break;
 			}
 

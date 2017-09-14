@@ -26,7 +26,8 @@ public class Constants {
 	public static final String MISSING_POSITION_EXCEPTION = "Since the initial co-ordinates and direction are not specified next to your PLACE command, the robot's directions could not be simulated. Please try again!";
 	public static final String POSITION_SPEC_EXCEPTION = "Robot position undetermined since initial position co-ordinates are not specified properly";
 	public static final String DIRECTION_EXCEPTION = "Robot position undetermined since initial direction specified is invalid. Please try again!";
-	
+	public static final String NUMBER_FORMAT_EXCEPTION = "The co-ordinates given for PLACE command is invalid";
+	public static final String INVALID_POSITION_EXCEPTION = "Robot position is undetermined. Please specify as 'PLACE 4,5,NORTH' for example. Please try again!";
 			
 
 }
