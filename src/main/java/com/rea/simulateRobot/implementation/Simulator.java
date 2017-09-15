@@ -20,15 +20,18 @@ public class Simulator {
 	public void simulate() {
 		decorators();
 		List<String> commandList = getInputCommands();
+
 		try {
 			Position position = getFinalLocation(commandList);
-			if(position.getDirection() != null){
-				System.out.println(Constants.OUTPUT+position.getX_coordinate() + "," + position.getY_coordinate() + "," + position.getDirection());
+			if (position.getDirection() != null) {
+				System.out.println(Constants.OUTPUT + position.getX_coordinate() + "," + position.getY_coordinate() + ","
+						+ position.getDirection());
 			}
+		} catch (CannotPlaceRobotException cpre) {
 			
-		} catch (CannotPlaceRobotException cpe) {
-			System.out.println(cpe.getMessage());
-		} 
+			System.out.println(Constants.PLACE_EXCEPTION);
+		}
+		
 
 	}
 
@@ -39,15 +42,13 @@ public class Simulator {
 		boolean isPlaced = false;
 		
 		for (int i = 0; i < commandList.size(); i++) {
-			
+
 			String[] commandArr = commandList.get(i).split(" ");
 			try {
-				
 
 				// checks if command is PLACE
 				if (commandArr.length > 1 && commandArr[0].equalsIgnoreCase(Constants.PLACE)) {
 					// System.out.println("encountered PLACE command");
-					
 
 					position = setInitialPosition(commandArr);
 
@@ -66,8 +67,7 @@ public class Simulator {
 				} else {
 
 					if (isPlaced) {
-						// System.out.println("found PLACE command! Proceeding
-						// with "+commandList.get(i)+" command now!");
+
 						if (finalPosition.getDirection() != null)
 							finalPosition = getLocationAfterMovement(finalPosition, commandList.get(i));
 					}
@@ -80,21 +80,25 @@ public class Simulator {
 
 			} catch (InvalidPositionException ipe) {
 				System.out.println(commandList.get(i) + " is not a valid position. " + ipe.getMessage());
-			} catch(NumberFormatException ne) {
-				System.out.println(Constants.NUMBER_FORMAT_EXCEPTION + "("+commandArr[1]+") is invalid.");
 			} catch (PositionNotSpecifiedException pnse) {
 				System.out.println(pnse.getMessage());
-			} catch(MissingPositionSpecException mpse) {
-				System.out.println(mpse.getMessage()+ "("+commandArr[1]+") is invalid.");
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
+			} catch (MissingPositionSpecException mpse) {
+				System.out.println(mpse.getMessage() + "(" + commandArr[1] + ") is invalid.");
+			} catch (CannotPlaceRobotException cpre) {
+				System.out.println(Constants.PLACE_EXCEPTION);
+			} catch (InvalidDirectionException ide) {
+				System.out.println(ide.getMessage());
+			} catch (NumberFormatException nfe) {
+				System.out.println(Constants.NUMBER_FORMAT_EXCEPTION + "(" + commandArr[1] + ") is invalid.");
 			}
 		}
 		
 		//System.out.println("final location :: "+finalPosition);
 		
 		if(!isPlaced)
-			throw new CannotPlaceRobotException(Constants.PLACE_EXCEPTION);
+			
+				throw new CannotPlaceRobotException(Constants.PLACE_EXCEPTION);
+		
 		
 		return finalPosition;
 	}
@@ -192,8 +196,8 @@ public class Simulator {
 		return finalPosition;
 	}
 
-	private Position setInitialPosition(String[] placeCommandArr)
-			throws CannotPlaceRobotException, PositionNotSpecifiedException, InvalidPositionException, MissingPositionSpecException {
+	public Position setInitialPosition(String[] placeCommandArr)
+			throws CannotPlaceRobotException, PositionNotSpecifiedException, InvalidPositionException, MissingPositionSpecException, InvalidDirectionException {
 
 		Position position = new Position();
 
@@ -219,7 +223,7 @@ public class Simulator {
 	}
 
 	//setting coordinates from PLACE command to Direction object of Robot
-	private Position processRobotPosition(String positionStr) throws MissingPositionSpecException {
+	private Position processRobotPosition(String positionStr) throws MissingPositionSpecException, InvalidDirectionException {
 
 		Position position = new Position();
 
@@ -242,17 +246,14 @@ public class Simulator {
 	}
 
 	//checks if user has given valid direction
-	private void checkIfValidDirection(String direction, Position position) {
+	private void checkIfValidDirection(String direction, Position position) throws InvalidDirectionException {
 
-		try {
-			if (EnumUtils.isValidEnum(Direction.class, direction.toUpperCase())) {
-				position.setDirection(Enum.valueOf(Direction.class, direction.toUpperCase()));
-			} else {
-				// throws exception for invalid direction
-				throw new InvalidDirectionException(direction + " is an invalid direction. "+Constants.DIRECTION_EXCEPTION);
-			}
-		} catch (InvalidDirectionException ide) {
-			System.out.println(ide.getMessage());
+		if (EnumUtils.isValidEnum(Direction.class, direction.toUpperCase())) {
+			position.setDirection(Enum.valueOf(Direction.class, direction.toUpperCase()));
+		} else {
+			// throws exception for invalid direction
+			throw new InvalidDirectionException(
+					direction + " is an invalid direction. " + Constants.DIRECTION_EXCEPTION);
 		}
 
 	}
