@@ -18,29 +18,35 @@ import com.rea.simulateRobot.model.Position;
 public class Simulator {
 
 	public void simulate() {
+		
+		//displays rules and example
 		decorators();
+		
+		//gets input commands from user
 		List<String> commandList = getInputCommands();
 
 		try {
 			Position position = getFinalLocation(commandList);
 			if (position.getDirection() != null) {
-				System.out.println(Constants.OUTPUT + position.getX_coordinate() + "," + position.getY_coordinate() + ","
+				System.out.println(Constants.OUTPUT.toUpperCase() + position.getX_coordinate() + "," + position.getY_coordinate() + ","
 						+ position.getDirection());
+				System.out.println(Constants.DECORATION);
 			}
 		} catch (CannotPlaceRobotException cpre) {
 			
 			System.out.println(Constants.PLACE_EXCEPTION);
-		}
-		
+		}		
 
 	}
 
+	//method which calculates the final position of the robot
 	public Position getFinalLocation(List<String> commandList) throws CannotPlaceRobotException {
 		
 		Position finalPosition = new Position();
 		Position position = new Position();
 		boolean isPlaced = false;
 		
+		//iterating through each user command
 		for (int i = 0; i < commandList.size(); i++) {
 
 			String[] commandArr = commandList.get(i).split(" ");
@@ -65,7 +71,7 @@ public class Simulator {
 						isPlaced = true;
 					}
 				} else {
-
+					//proceeds with commands only if a valid PLACE command is encountered
 					if (isPlaced) {
 
 						if (finalPosition.getDirection() != null)
@@ -73,7 +79,8 @@ public class Simulator {
 					}
 					continue;
 				}
-
+				
+				//continues with iteration if user has given empty command
 				if (commandList.get(i).equals("")) {
 					continue;
 				}
@@ -269,9 +276,11 @@ public class Simulator {
 		showRules();
 		showExample();
 		
-		System.out.println(Constants.INPUT);
+		System.out.println(Constants.INPUT.toUpperCase());
+		System.out.println(Constants.EMPTY_STRING);
 	}
-
+	
+	//displays rules
 	private void showRules() {
 		
 		System.out.println(Constants.EMPTY_STRING);
@@ -289,6 +298,7 @@ public class Simulator {
 		
 	}
 
+	//displays example
 	private void showExample() {
 		
 		System.out.println(Constants.SAMPLE_INPUT);

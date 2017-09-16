@@ -12,9 +12,9 @@ public class Constants {
 	//RULES
 	public static final String RULES = "Here are the few commands to simulate movement to the robot on the table :";
 	public static final String RULE_PLACE = "1) PLACE 0,0,F : This command will PLACE your robot on the table at 0,0 co-ordinates facing F direction";
-	public static final String EXAMPLE = "For example: PLACE 0,0,NORTH - This command will place your robot on the table on the SOUTH-WEST corner of the table, facing in NORTH direction";
+	public static final String EXAMPLE = "For example: PLACE 0,0,NORTH - This command will place your robot on the table at the SOUTH-WEST corner of the table, facing NORTH direction";
 	public static final String VALID_DIRECTIONS = "2) Valid directions are : NORTH, EAST, SOUTH, WEST. Any PLACE command with invalid position will be IGNORED";
-	public static final String TABLE_MEASUREMENT = "3) Remember that the tables's measurement is 5units * 5units!";
+	public static final String TABLE_MEASUREMENT = "3) Remember that the table's measurement is 5units * 5units!";
 	public static final String RULE_MOVE = "4) MOVE : This command will move the robot by 1 unit in the direction it is currently facing";
 	public static final String RULE_LEFTRIGHT = "5) LEFT/RIGHT : Either of these commands will rotate the robot 90 degrees. This command will not affect the position of the robot";
 	public static final String RULE_REPORT = "6) REPORT : This command will give the final position of the robot";
@@ -30,7 +30,7 @@ public class Constants {
 	public static final String EXAMPLE_OUTPUT = OUTPUT + "1,3,NORTH";
 	
 	
-	public static final String INPUT = "====================Lets move our robot now! Please enter your commands====================";
+	public static final String INPUT = "Lets move our robot now! Please enter your commands :";
 	
 	
 	//COMMANDS
